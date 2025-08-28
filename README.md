@@ -13,8 +13,16 @@
 - Colonnes attendues : `Date` (date), `Compte` (texte/numérique), `Libellé` (texte), `Montant` (numérique)
 - Exemple de comptes : 411 (Clients), 512 (Banque), 601 (Achats), 606 (Fournitures), 44566 (TVA déductible)
 
-## 🔧 Installation rapide
+##  Installation rapide
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements.txt      (`prophet` est déjà inclus dans `requirements.txt`).
+
+### Installation complète (script d’analyse)
+pip install -r requirements-full.txt
+
+
+
+
+
