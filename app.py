@@ -1,4 +1,7 @@
 import os
+import io
+from datetime import datetime
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import streamlit as st
@@ -72,21 +75,25 @@ if df.empty:
                "`factures_comptables_nettoyees.xlsx` ou `factures_comptables_brutes.xlsx`.")
     st.stop()
 
-# ---------- Filtres ----------
+# ---------- Sidebar (réglages & actions) ----------
+with st.sidebar:
+    st.header("⚙️ Réglages")
+    comptes = ["(Tous)"] + sorted([str(x) for x in df.get("compte", pd.Series(dtype=str)).dropna().unique()])
+    type_options = ["(Tous)"] + sorted(df.get("type", pd.Series(["Entrée","Sortie"])).dropna().unique().tolist())
+    top_n = st.slider("Top N comptes", min_value=3, max_value=15, value=8, step=1)
+    debug_mode = st.checkbox("Afficher debug", value=False)
+
+# ---------- Filtres (header) ----------
 col1, col2, col3 = st.columns(3)
 with col1:
-    comptes = ["(Tous)"] + sorted([str(x) for x in df.get("compte", pd.Series(dtype=str)).dropna().unique()])
     compte_sel = st.selectbox("Compte", comptes)
 with col2:
-    types = ["(Tous)"] + sorted(df.get("type", pd.Series(["Entrée", "Sortie"])).dropna().unique().tolist())
-    type_sel = st.selectbox("Type d'opération", types)
+    type_sel = st.selectbox("Type d'opération", type_options)
 with col3:
     if "date" in df.columns and df["date"].notna().any():
         dmin = pd.to_datetime(df["date"].min())
         dmax = pd.to_datetime(df["date"].max())
-        start, end = st.slider("Période",
-                               min_value=dmin.to_pydatetime(),
-                               max_value=dmax.to_pydatetime(),
+        start, end = st.slider("Période", min_value=dmin.to_pydatetime(), max_value=dmax.to_pydatetime(),
                                value=(dmin.to_pydatetime(), dmax.to_pydatetime()))
     else:
         start = end = None
@@ -110,6 +117,27 @@ colA.metric("Résultat filtré", f"{total:,.2f} €".replace(",", " ").replace("
 colB.metric("Total entrées", f"{entrees:,.2f} €".replace(",", " ").replace(".", ","))
 colC.metric("Total sorties", f"{sorties:,.2f} €".replace(",", " ").replace(".", ","))
 
+# ---------- Exports (CSV / Excel) ----------
+exp_col1, exp_col2 = st.columns(2)
+with exp_col1:
+    csv_bytes = dff.to_csv(index=False).encode("utf-8")
+    st.download_button(
+        "⬇️ Télécharger les données filtrées (CSV)",
+        data=csv_bytes,
+        file_name=f"donnees_filtrees_{datetime.now():%Y%m%d}.csv",
+        mime="text/csv",
+    )
+with exp_col2:
+    out = io.BytesIO()
+    with pd.ExcelWriter(out, engine="xlsxwriter") as writer:
+        dff.to_excel(writer, index=False, sheet_name="Filtre")
+    st.download_button(
+        "⬇️ Télécharger les données filtrées (Excel)",
+        data=out.getvalue(),
+        file_name=f"donnees_filtrees_{datetime.now():%Y%m%d}.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+
 st.divider()
 
 # ---------- Graphiques (format compacts) ----------
@@ -127,12 +155,12 @@ if {"date", "montant"}.issubset(dff.columns) and dff["date"].notna().any():
 
 # 2) Top comptes
 if {"compte", "montant"}.issubset(dff.columns):
-    st.subheader("Top comptes (par somme des montants)")
+    st.subheader(f"Top {top_n} comptes (par somme des montants)")
     dff["compte"] = dff["compte"].astype("string")
     top = (dff.groupby("compte", dropna=True)["montant"]
              .sum()
              .sort_values(ascending=False)
-             .head(8))
+             .head(top_n))
     if not top.empty:
         fig2, ax2 = plt.subplots(figsize=(8, 3))
         top.plot(kind="bar", ax=ax2)
@@ -142,7 +170,8 @@ if {"compte", "montant"}.issubset(dff.columns):
         st.pyplot(fig2, use_container_width=True)
 
 # ---------- Debug (optionnel) ----------
-with st.expander("🔎 Debug (optionnel)"):
-    st.write("Colonnes:", list(df.columns))
-    st.write("Types:", df.dtypes)
-    st.write(dff.head(10))
+if debug_mode:
+    with st.expander("🔎 Debug"):
+        st.write("Colonnes:", list(df.columns))
+        st.write("Types:", df.dtypes)
+        st.write(dff.head(10))
