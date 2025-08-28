@@ -152,7 +152,7 @@ with exp_col2:
 
 st.divider()
 
-# ---------------- Graphiques (compacts, axes formatés FR) ----------------
+# ---------------- Graphiques ----------------
 # 1) Solde cumulé
 if {"date", "montant"}.issubset(dff.columns) and dff["date"].notna().any():
     dff = dff.sort_values("date")
