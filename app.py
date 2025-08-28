@@ -140,7 +140,7 @@ with exp_col2:
 
 st.divider()
 
-# ---------- Graphiques (format compacts) ----------
+# ---------- Graphiques ----------
 # 1) Évolution du solde cumulé
 if {"date", "montant"}.issubset(dff.columns) and dff["date"].notna().any():
     dff = dff.sort_values("date")
@@ -169,9 +169,9 @@ if {"compte", "montant"}.issubset(dff.columns):
         fig2.tight_layout()
         st.pyplot(fig2, use_container_width=True)
 
-# ---------- Debug (optionnel) ----------
+# ---------- Debug ----------
 if debug_mode:
-    with st.expander("🔎 Debug"):
+    with st.expander("Debug"):
         st.write("Colonnes:", list(df.columns))
         st.write("Types:", df.dtypes)
         st.write(dff.head(10))

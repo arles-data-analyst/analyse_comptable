@@ -1,0 +1,14 @@
+printf "%s\n" \
+pandas \
+matplotlib \
+seaborn \
+scikit-learn \
+prophet \
+cmdstanpy \
+openpyxl \
+xlsxwriter \
+python-docx > requirements-full.txt
+
+git add requirements-full.txt
+git commit -m "Add requirements-full for full analysis (script)"
+git push
