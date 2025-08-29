@@ -178,7 +178,7 @@ with gcol1:
 # 2) Top comptes (droite)
 with gcol2:
     if {"compte", "montant"}.issubset(dff.columns):
-        st.markdown(f"#### Top {top_n} comptes")
+        st.markdown("#### Top comptes")
         dff["compte"] = dff["compte"].astype("string")
         top = (dff.groupby("compte", dropna=True)["montant"]
                  .sum().sort_values(ascending=False).head(top_n))
