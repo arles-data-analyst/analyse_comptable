@@ -6,10 +6,21 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 import streamlit as st
+from pathlib import Path
 
-# ---------------- Page ----------------
-st.set_page_config(page_title="Analyse comptable", page_icon="📊", layout="wide")
-st.title("🧾 Tableau de bord d’analyse comptable")
+# --- config logo ---
+LOGO = "assets/logo.png"            # si ton fichier est .png
+if not Path(LOGO).exists():
+    LOGO = "assets/logo.jpg"        # fallback si tu as mis un .jpg
+
+st.set_page_config(page_title="Analyse comptable", page_icon=LOGO, layout="wide")
+
+# en-tête avec logo + titre
+col_logo, col_title = st.columns([1, 20])
+with col_logo:
+    st.image(LOGO, width=36)
+with col_title:
+    st.markdown("# Tableau de bord d’analyse comptable")
 
 # ---------------- Utils ----------------
 def file_mtime(path: str) -> float:
