@@ -9,7 +9,7 @@ import streamlit as st
 
 # ---------------- Page ----------------
 st.set_page_config(page_title="Analyse comptable", page_icon="📊", layout="wide")
-st.title("Tableau de bord d’analyse comptable")
+st.title("🧾 Tableau de bord d’analyse comptable")
 
 # ---------------- Utils ----------------
 def file_mtime(path: str) -> float:
