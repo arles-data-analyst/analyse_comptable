@@ -42,6 +42,10 @@ def eur(x, decimals: int = 2, symbol: bool = True) -> str:
     s = f"{float(x):,.{decimals}f}".replace(",", " ").replace(".", ",")
     return f"{s} €" if symbol else s
 
+def add_watermark(fig, text="© 2025 Arlès Fanampindrainy — analyse-comptable.streamlit.app"):
+    """Ajoute un filigrane discret en bas à droite de la figure."""
+    fig.text(0.995, 0.005, text, ha="right", va="bottom", fontsize=7, color="0.5", alpha=0.6)
+
 # ---------------- Chargement (cache bust sur mtime) ----------------
 brut_path = "factures_comptables_brutes.xlsx"
 nettoye_path = "factures_comptables_nettoyees.xlsx"
@@ -168,6 +172,7 @@ with gcol1:
         ax1.tick_params(axis="both", labelsize=9)
         ax1.yaxis.set_major_formatter(FuncFormatter(lambda y, _: eur(y, decimals=0, symbol=False)))
         fig1.tight_layout()
+        add_watermark(fig1)
         st.pyplot(fig1, use_container_width=True)
 
 # 2) Top comptes (droite)
@@ -198,4 +203,30 @@ with gcol2:
                     clip_on=False,
                 )
             fig2.tight_layout()
+            add_watermark(fig2)
             st.pyplot(fig2, use_container_width=True)
+
+# ---------------- Debug ----------------
+if debug_mode:
+    with st.expander("🔎 Debug"):
+        st.write("Colonnes:", list(df.columns))
+        st.write("Types:", df.dtypes)
+        st.write(dff.head(10))
+
+# --- Copyright / footer visible ---
+st.markdown(
+    """
+    <style>
+    .footer-copyright {
+        position: fixed; left: 0; bottom: 0; width: 100%;
+        text-align: center; font-size: 12px; color: #666;
+        background: rgba(255,255,255,0.75); padding: 6px 0; z-index: 9999;
+        backdrop-filter: blur(2px);
+    }
+    </style>
+    <div class="footer-copyright">
+      © 2025 Arlès Fanampindrainy — analyse-comptable.streamlit.app — Reproduction interdite sans attribution.
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
