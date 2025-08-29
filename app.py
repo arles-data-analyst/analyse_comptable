@@ -152,52 +152,50 @@ with exp_col2:
 
 st.divider()
 
-# ---------------- Graphiques ----------------
-# 1) Solde cumulé
-if {"date", "montant"}.issubset(dff.columns) and dff["date"].notna().any():
-    dff = dff.sort_values("date")
-    dff["solde_cumulé_view"] = dff["montant"].cumsum()
-    st.subheader("Évolution du solde cumulé (filtré)")
-    fig1, ax1 = plt.subplots(figsize=(9, 3))
-    ax1.plot(dff["date"], dff["solde_cumulé_view"])
-    ax1.set_xlabel("Date")
-    ax1.set_ylabel("Solde cumulé (€)")
-    ax1.yaxis.set_major_formatter(FuncFormatter(lambda y, _: eur(y, decimals=0, symbol=False)))
-    fig1.tight_layout()
-    st.pyplot(fig1, use_container_width=True)
+# ---------- Graphiques (compacts, 2 colonnes) ----------
+gcol1, gcol2 = st.columns(2)
 
-# 2) Top comptes
-if {"compte", "montant"}.issubset(dff.columns):
-    st.subheader(f"Top {top_n} comptes (par somme des montants)")
-    dff["compte"] = dff["compte"].astype("string")
-    top = (
-        dff.groupby("compte", dropna=True)["montant"]
-        .sum()
-        .sort_values(ascending=False)
-        .head(top_n)
-    )
-    if not top.empty:
-        fig2, ax2 = plt.subplots(figsize=(8, 3))
-        top.plot(kind="bar", ax=ax2)
-        ax2.set_xlabel("Compte")
-        ax2.set_ylabel("Montant total (€)")
-        ax2.yaxis.set_major_formatter(FuncFormatter(lambda y, _: eur(y, decimals=0, symbol=False)))
-        # labels au-dessus de chaque barre
-        for p in ax2.patches:
-            v = p.get_height()
-            ax2.annotate(
-                eur(v, decimals=0),
-                (p.get_x() + p.get_width() / 2, v),
-                ha="center",
-                va="bottom" if v >= 0 else "top",
-                fontsize=9,
-            )
-        fig2.tight_layout()
-        st.pyplot(fig2, use_container_width=True)
+# 1) Solde cumulé (gauche)
+with gcol1:
+    if {"date", "montant"}.issubset(dff.columns) and dff["date"].notna().any():
+        dff = dff.sort_values("date")
+        dff["solde_cumulé_view"] = dff["montant"].cumsum()
+        st.markdown("#### Solde cumulé (filtré)")
+        fig1, ax1 = plt.subplots(figsize=(6, 2.6))
+        ax1.plot(dff["date"], dff["solde_cumulé_view"])
+        ax1.set_xlabel("Date", fontsize=10)
+        ax1.set_ylabel("Solde cumulé (€)", fontsize=10)
+        ax1.tick_params(axis="both", labelsize=9)
+        ax1.yaxis.set_major_formatter(FuncFormatter(lambda y, _: eur(y, decimals=0, symbol=False)))
+        fig1.tight_layout()
+        st.pyplot(fig1, use_container_width=True)
 
-# ---------------- Debug ----------------
-if debug_mode:
-    with st.expander("🔎 Debug"):
-        st.write("Colonnes:", list(df.columns))
-        st.write("Types:", df.dtypes)
-        st.write(dff.head(10))
+# 2) Top comptes (droite)
+with gcol2:
+    if {"compte", "montant"}.issubset(dff.columns):
+        st.markdown(f"#### Top {top_n} comptes")
+        dff["compte"] = dff["compte"].astype("string")
+        top = (dff.groupby("compte", dropna=True)["montant"]
+                 .sum().sort_values(ascending=False).head(top_n))
+        if not top.empty:
+            fig2, ax2 = plt.subplots(figsize=(6, 2.6))
+            top.plot(kind="bar", ax=ax2)
+            ax2.set_xlabel("Compte", fontsize=10)
+            ax2.set_ylabel("Montant total (€)", fontsize=10)
+            ax2.tick_params(axis="x", labelrotation=0, labelsize=9)
+            ax2.tick_params(axis="y", labelsize=9)
+            ax2.yaxis.set_major_formatter(FuncFormatter(lambda y, _: eur(y, decimals=0, symbol=False)))
+            ax2.margins(y=0.15)  # marge en haut pour éviter que l'étiquette touche la bordure
+            for p in ax2.patches:
+                v = p.get_height()
+                ax2.annotate(
+                    eur(v, decimals=0),
+                    (p.get_x() + p.get_width()/2, v),
+                    ha="center",
+                    va="bottom" if v >= 0 else "top",
+                    fontsize=9,
+                    xytext=(0, 2), textcoords="offset points",
+                    clip_on=False,
+                )
+            fig2.tight_layout()
+            st.pyplot(fig2, use_container_width=True)
