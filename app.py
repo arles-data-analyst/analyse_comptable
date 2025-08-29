@@ -162,7 +162,7 @@ if {"date", "montant"}.issubset(dff.columns) and dff["date"].notna().any():
     ax1.plot(dff["date"], dff["solde_cumulé_view"])
     ax1.set_xlabel("Date")
     ax1.set_ylabel("Solde cumulé (€)")
-    ax1.yaxis.set_majorFormatter(FuncFormatter(lambda y, _: eur(y, decimals=0, symbol=False)))
+    ax1.yaxis.set_major_formatter(FuncFormatter(lambda y, _: eur(y, decimals=0, symbol=False)))
     fig1.tight_layout()
     st.pyplot(fig1, use_container_width=True)
 
@@ -181,7 +181,7 @@ if {"compte", "montant"}.issubset(dff.columns):
         top.plot(kind="bar", ax=ax2)
         ax2.set_xlabel("Compte")
         ax2.set_ylabel("Montant total (€)")
-        ax2.yaxis.set_majorFormatter(FuncFormatter(lambda y, _: eur(y, decimals=0, symbol=False)))
+        ax2.yaxis.set_major_formatter(FuncFormatter(lambda y, _: eur(y, decimals=0, symbol=False)))
         # labels au-dessus de chaque barre
         for p in ax2.patches:
             v = p.get_height()
