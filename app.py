@@ -8,14 +8,11 @@ from matplotlib.ticker import FuncFormatter
 import streamlit as st
 from pathlib import Path
 
-# --- config logo ---
-LOGO = "assets/logo.png"            # si ton fichier est .png
-if not Path(LOGO).exists():
-    LOGO = "assets/logo.jpg"        # fallback si tu as mis un .jpg
+from pathlib import Path
 
+LOGO = "assets/logo.png"
 st.set_page_config(page_title="Analyse comptable", page_icon=LOGO, layout="wide")
 
-# en-tête avec logo + titre
 col_logo, col_title = st.columns([1, 20])
 with col_logo:
     st.image(LOGO, width=36)
