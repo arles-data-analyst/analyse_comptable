@@ -6,44 +6,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 import streamlit as st
-from pathlib import Path
 
-# --- config logo ---
-LOGO = "assets/logo.png"
-if not Path(LOGO).exists():
-    LOGO = "assets/logo.jpg"
-
-st.set_page_config(page_title="Analyse comptable", page_icon=LOGO, layout="wide")
-
-# --- HEADER centré : logo + titre parfaitement alignés ---
-st.markdown(f"""
-<style>
-.app-header {{
-  display: flex;
-  align-items: center;      /* aligne verticalement logo + texte */
-  justify-content: center;  /* centre l'ensemble sur la page */
-  gap: 12px;                /* espace entre logo et titre */
-  margin: 6px 0 12px 0;
-}}
-.app-header img {{
-  width: 48px;              /* ajuste la taille du logo ici */
-  height: 48px;
-}}
-.app-title {{
-  font-weight: 800;
-  font-size: 2rem;          /* titre large et lisible */
-  margin: 0;
-}}
-@media (max-width: 768px) {{
-  .app-header img {{ width: 36px; height: 36px; }}
-  .app-title {{ font-size: 1.6rem; }}
-}}
-</style>
-<div class="app-header">
-  <img src="{LOGO}" alt="logo">
-  <h1 class="app-title">Tableau de bord d’analyse comptable</h1>
-</div>
-""", unsafe_allow_html=True)
+# ---------------- Page ----------------
+st.set_page_config(page_title="Analyse comptable", page_icon="📊", layout="wide")
+st.title("📊 Tableau de bord d’analyse comptable")
 
 # ---------------- Utils ----------------
 def file_mtime(path: str) -> float:
